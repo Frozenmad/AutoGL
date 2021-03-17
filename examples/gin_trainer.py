@@ -10,13 +10,13 @@ import os.path as osp
 path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data', 'TU')
 dataset = TUDataset(path, name='MUTAG')
 idxs = json.load(open('test.json', 'r'))
-dataset = dataset[idxs]
+dataset = dataset
 #dataset = build_dataset_from_name('mutag')
 #idxs = json.load(open('test.json'))
-train_split = len(dataset) // 10 * 8
-dataset.train_index = list(range(train_split))
-dataset.val_index = list(range(train_split, train_split + len(dataset) // 10))
-dataset.test_index = list(range(len(dataset) - len(dataset) // 10, len(dataset)))
+fold = len(dataset) // 10
+dataset.train_index = idxs[:fold * 8]
+dataset.val_index = idxs[fold * 8:fold * 9]
+dataset.test_index = idxs[fold * 9:]
 dataset.train_split = dataset[dataset.train_index]
 dataset.val_split = dataset[dataset.val_index]
 dataset.test_split = dataset[dataset.test_index]

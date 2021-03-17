@@ -11,12 +11,14 @@ import json
 
 path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data', 'TU')
 dataset = TUDataset(path, name='MUTAG')
-import json
-idxs = json.load(open('test.json'))
+idxs = json.load(open('test.json', 'r'))
 dataset = dataset[idxs]
-test_dataset = dataset[:len(dataset) // 10]
-train_dataset = dataset[len(dataset) // 10:]
+fold = len(dataset) // 10
+train_dataset = dataset[:fold * 8]
+val_dataset = dataset[fold * 8:fold * 9]
+test_dataset = dataset[fold * 9:]
 test_loader = DataLoader(test_dataset, batch_size=128)
+val_loader = DataLoader(val_dataset, batch_size=128)
 train_loader = DataLoader(train_dataset, batch_size=128)
 
 class Net(torch.nn.Module):
@@ -67,7 +69,7 @@ class Net(torch.nn.Module):
         return F.log_softmax(x, dim=-1)
 
 
-device = torch.device('cuda:3' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def train(epoch):
     model.train()
@@ -113,13 +115,12 @@ with tqdm(range(100)) as t:
 
         for epoch in range(1, 101):
             train_loss = train(epoch)
-            #val_acc_now = test(val_loader)
-            #if val_acc < val_acc_now:
-            #    test_acc = test(test_loader)
+            val_acc_now = test(val_loader)
+            if val_acc < val_acc_now:
+                test_acc = test(test_loader)
             #print('Epoch: {:03d}, Train Loss: {:.7f}, '
             #      'Train Acc: {:.7f}, Test Acc: {:.7f}'.format(epoch, train_loss,
             #                                                   train_acc, test_acc))
-        test_acc = test(test_loader)
         tacc.append(test_acc)
         t.set_postfix(now=test_acc, mean=np.mean(tacc), std=0 if len(tacc) == 1 else np.std(tacc))
 
