@@ -1,0 +1,47 @@
+feature: ~
+
+models:
+  - name: gin
+    hp_space:
+      - value: 7
+        parameterName: num_layers
+        type: FIXED
+      - value: [32, 32, 32, 32, 32, 32]
+        parameterName: hidden
+        type: FIXED
+      - value: 0.5
+        parameterName: dropout
+        type: FIXED
+      - value: relu
+        parameterName: act
+        type: FIXED
+      - value: 0
+        parameterName: eps
+        type: FIXED
+      - value: 2
+        parameterName: mlp_layers
+        type: FIXED
+
+trainer:
+  hp_space:
+  - parameterName: max_epoch
+    type: FIXED
+    value: 101
+  - parameterName: batch_size
+    type: FIXED
+    value: 128
+  - parameterName: early_stopping_round
+    type: FIXED
+    value: 100
+  - parameterName: lr
+    type: FIXED
+    value: 0.01
+  - parameterName: weight_decay
+    type: FIXED
+    value: 0.0
+
+hpo:
+  name: random
+  max_evals: 1
+
+ensemble: ~

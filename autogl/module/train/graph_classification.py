@@ -249,6 +249,11 @@ class GraphClassificationTrainer(BaseTrainer):
 
         for epoch in range(1, self.max_epoch):
             self.model.model.train()
+
+            if epoch == 51:
+                for param_group in optimizer.param_groups:
+                    param_group['lr'] = 0.5 * param_group['lr']
+
             loss_all = 0
             for data in train_loader:
                 data = data.to(self.device)
